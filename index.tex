@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+% \include{snippets}
+
+\begin{document}
+\title{Idea summary for HBS segmentation project}
+\author{Lin Chenran}
+\maketitle
+
+Our goal is to build a quasi-comformal segmentation model with shape prior. HBS is a powerful signature of simply-connected shapes for this task. We will use the model to segment the image into 2 parts, target shape and background, and the HBS can refine the segmentation result.
+
+
+\section{Model 1}
+At begining, we will use a simple model to test the idea as
+\begin{equation}\label{eq1}
+    E(f) = \int_\Omega | I \circ f - J  |^2 + \alpha \int_\Omega | \nabla f |^2 + \beta \int_\Omega | \mu(f) - \bar{\mu} |^2
+\end{equation}
+where $f$ is the segmentation function, $I$ is the image, $J$ is the template shape, $\mu(f)$ is the Beltrami coefficient of $f$, $\bar{\mu}$ is the shape prior, $\alpha$ and $\beta$ are the weights of the regularization terms. Actually, the shape prior $\bar{\mu}$ is the mean of HBS of a special kind of shapes. The first item of (\ref{eq1}) is the difference between deformed template and the given image. The second item is the smoothness term. The third item is the shape prior term.
+
+To optimize the model, we use variable split method to release the contrain between $f$ and $\mu(f)$, which should satisify Beltrami equation. The model (\ref{eq1}) can be rewritten as
+\begin{equation}\label{eq2}
+    E(f, \nu) = \int_\Omega | I \circ f - J  |^2 + \alpha \int_\Omega | \nabla f |^2 + \beta \int_\Omega | \nu - \bar{\mu} |^2 + \gamma \int_\Omega | \nu - \mu(f) |^2.
+\end{equation}
+Then we split it into 2 subproblems to minimize (\ref{eq2}), which is $f$-subproblem
+\begin{equation}\label{eq3}
+    f_{n+1} = \arg\min_{f} \left\{ \int_\Omega | I \circ f - J_n  |^2 + \alpha \int_\Omega | \nabla f |^2 \right\},
+\end{equation}
+and $\nu$-subproblem
+\begin{equation}\label{eq4}
+    \nu_{n+1} = \arg\min_{\nu} \left\{\beta \int_\Omega | \nu - \bar{\mu} |^2 + \gamma \int_\Omega | \nu - \mu_{n+1} |^2 \right\},
+\end{equation}
+
+\subsection{Initialization step}
+There two main changes of the model comparing with traditional segmentation model. First, we use HBS as the shape prior by adding item $|\mu(f) - \bar{\mu} |$. Second, we start the iteration from the given shape prior $\bar{\mu}$.
+
+In the initialization step, we use the given HBS $\bar{\mu}$ to reconstruct the initial function $\bar{f}$. Because of the properties of HBS, $\bar{f}$ is only defined on $\mathbb{D}$ and can only be determined up to a rotation, translation and scaling. Let $T(z) = az +b $, then we can find the optimal $T_0$ by solving the following problem 
+\begin{equation}\label{eq5}
+    T_0 = \arg\min_T \int_\Omega | I \circ T \circ \tilde{f}  - J |^2,
+\end{equation}
+where $\tilde{f} = \bar{f}$ on $\mathbb{D}$ and $\tilde{f} = Id$ on $\mathbb{C} \setminus \mathbb{D}$. Then we can get the initial function $f_0 = T_0 \circ \tilde{f}$ and $J_0 = J \circ f_0^{-1}$.
+
+Now we start the iteration from $f_0$. In each iteration, we first solve the $f$-subproblem (\ref{eq3}) to get $f_{n+1}$, then solve the $\nu$-subproblem (\ref{eq4}) to get $\nu_{n+1}$. We repeat the iteration until the energy $E(f_n, \nu_n)$ converges.
+
+\subsection{f-subproblem}
+Let $f = Id + u$, consider the Taylor expansion of energy function of (\ref{eq3})
+\begin{equation}
+    E_f \approx \| \nabla I (f - Id ) + I - J_n \|^2_2 + \alpha \| \nabla f \|^2_2 = \| \nabla I u + I - J_n \|^2_2 + \alpha \| \nabla u \|^2_2.
+\end{equation}
+The Euler-Lagrangian equation $\partial E_f / \partial u = 0$ for minimizing the above energy functional shows that the minimizer $u_{n+1}$ satisfies
+\begin{equation}
+    ( \nabla I ^2 - \alpha \Delta) u_{n+1} = \nabla I (J_n - I),
+\end{equation}
+which is a linear equation of a vector function and can be solved easily, by incorporating with the boundary condition $u_n+1 =0 $ on $\partial \Omega$.
+
+After getting $f_{n+1} = u_{n+1} + Id$, we can update $J_{n+1} = J_n \circ f_{n+1}^{-1}$, $F_{n+1} = f_{n+1} \circ F_n$ and then $\mu_{n+1} = \mu(F_{n+1})$.
+
+\subsection{$\nu$-subproblem}
+The energy function of (\ref{eq4}) is
+\begin{equation}
+    E_\nu = \beta \| \nu - \bar{\mu} \|^2_2 + \gamma \| \nu - \mu_{n+1} \|^2_2.
+\end{equation}
+Therefore, the minimizer is
+\begin{equation}
+    \nu_{n+1} = \frac{\beta \bar{\mu} + \gamma \mu_{n+1}}{\beta + \gamma}.
+\end{equation}
+
+\subsection{Summary of algorithm}
+
+\begin{algorithm}[H]                           % HERE!!!!!!!!!
+        \caption{Algothim 1}          % give the algorithm a caption
+        \label{alg1}      % and a label for \ref{} commands later in the document
+        \begin{algorithmic}  % enter the algorithmic environment
+            \STATE \textbf{Inputs:} Image $I$, template $J$, HBS $\bar{\mu}$.
+            \STATE \textbf{Initialize:} reconstruct $\bar{f}$ from $\bar{\mu}$, then extend to $\tilde{f}$.
+            \STATE Find $T_0$ by solving (\ref{eq5}), and let $f_0 = T_0 \circ \tilde{f}$, $J_0 = J \circ f_0^{-1}$, $F_0 = f_0$, $n=0$.
+            \WHILE{$n < N$}
+                \STATE Solve $f$-subproblem (\ref{eq3}) to get $f_{n+1}$.
+                \STATE Let $\mu_{n+1} = \mu(f_{n+1} \circ F_n)$.
+                \STATE Solve $\nu$-subproblem (\ref{eq4}) to get $\nu_{n+1}$.
+                \STATE Reconstruct $f^{\nu}_{n+1}$ from $\nu_{n+1}$.
+                \STATE Let $J_{n+1} = J_n \circ (f^{\nu}_{n+1})^{-1}$ and $F_{n+1} = f^{\nu}_{n+1} \circ F_n$.
+                \IF{converges}
+                    \STATE \textbf{break}
+                \ENDIF
+                \STATE Let $n = n+1$.
+            \ENDWHILE
+            \RETURN Segmentation function $F_{n+1}$.
+        \end{algorithmic}
+        \end{algorithm}
+
+\section{Model 2}
+To be continued...
+\begin{equation}
+    E(T, H) = \int_\Omega | I - J \circ T \circ g_H \circ H |^2 + \alpha \int_\mathbb{D} | \Delta H |^2 + \beta \int_\mathbb{D} | \mu(H) - \bar{\mu} |^2
+\end{equation}
+
+\end{document}
