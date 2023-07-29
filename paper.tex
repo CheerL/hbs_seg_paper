@@ -116,7 +116,7 @@ Thus, the Beltrami coefficient $\mu$ gives us important information about the pr
 
 \begin{figure}
     \begin{center}
-        \includegraphics[width=7.6cm]{fig3.png}
+        \includegraphics[width=7.6cm]{background_bc1.png}
     \end{center}
     \caption{Quasi-conformal maps infinitesimal circles to ellipses. The Beltrami coefficient measure the distortion or dilation of the ellipse under the QC map.}
     \label{fig3}
@@ -222,7 +222,7 @@ Meanwhile, the primary objective of the segmentation model \ref{bc seg model} is
 The triplets $(B, H, \D)$ of the HBS and $(\mu, f_\mu, R)$ of model \ref{bc seg model} exhibit extreme high correlation, which implies that the HBS can be naturally integrated into this model. However, there are several differences:
 \begin{enumerate}
     \item $B$ is defined on $\D$ while $\mu$ is defined on $D$. To solve this, we require $D \supset \D$ and extend $B$ to $D$ by $0$, that is
-          \begin{equation}
+          \begin{equation}\label{mu_B}
               \mu_B = \begin{cases}
                   B, & z \in \D,              \\
                   0, & z \in D \setminus \D.
@@ -407,9 +407,62 @@ By LBS method, we reconstruct the corresponding refined deform function $f_{\mu_
 \end{algorithm}
 
 
-% \section{Implementation detail}\label{implementation}
 
-\section{Experimental result}\label{result}
+\section{Experimental result}\label{resul}
+In this section, we demonstrate the effectiveness of the proposed HBS segmentation model through different experimental results. Our experiments are implemented using MATLAB R2014a running on 4-way Intel(R) Xeon(R) Gold 6230 processors with 80 cores at 2.10GHz base frequency and 1024 GB RAM under Ubuntu 18.04LTS 64-bit operating system.
+
+\subsection{Binary images}
+Deformation of the target object due to various reasons such as image corruption, object occlusion, etc., is very common. In such cases, prior information can greatly assist us in making accurate segmentations. By utilizing HBS as the prior, the proposed segmentation model is aware of the approximate shape of the target object beforehand, leading to improved performance. 
+
+To illustrate this more intuitively, we have constructed a series of simple binary images to validate our model and display the results in Figure \ref{exp1}. For each row, the 1st column is the original shape, the 2nd column is the template shape, the 3rd column is the HBS corresponding to the template shape, the 4th column is the segmentation result without HBS and the 5th column is the segmentation result of our proposed model. Before analyzing the results, it is important to clarify some points and we will use them in the following experiments unless otherwise specified.
+\begin{enumerate}
+    \item The template provided in the 2nd column is not the $J$ in our model, which has been fixed as the unit disk. Here the template shape is solely used to compute HBS and will not be fed into the model. We show them to help our humans to have a visual understanding of the prior information.
+    \item Exactly speaking, it is the magnitude of $\mu_{B,V}$ shown in the 3rd column.
+    \item The green line in 4th and 5th column is the segmentation boundary.
+    \item The segmentation result without HBS is obtained by setting $\lambda = \eta = 0$ of model \ref{hbs seg model}, which then is equivalent to the Beltrami coefficient segmentation model \ref{bc seg model}. We also use the unit disk as $J$.
+\end{enumerate}
+
+Let's look back on Figure \ref{exp1}, from which we can preliminarily obtain the following information:
+\begin{enumerate}
+    \item The HBS played a significant role in the low-quality image segmentation. We made some modifications to basic geometric shapes, resulting in them lacking certain parts or having additional parts. Under the guidance of HBS, our model essentially disregarded the impact of these variations and provided satisfactory segmentation, which almost matched the given template. While the segmentation result without HBS is much more faithful to the actual shape boundaries.
+    \item The proposed model can segment both the simply-connected and multi-connected images and then give simply-connected results. Although the HBS is the signature of simply-connected shapes, our model works well on multi-connected images in 3rd and 4th rows.
+    \item The proposed model does not impose any requirements on the position, size, or orientation of the target object in the image. The HBS is invariant under translation, rotation and scaling and our model inherited this feature. With the same HBS, 1st and 2nd row are rectangles in different size and our model can segment them correctly. Similarly, 3rd and 4th rows are triangles in different orientation.
+    \item The proposed model tolerates reasonable discrepancies between the prior information and the actual image. In the 5th row, the segmentation result is acceptable when the template is a circle and the image is close to a ellipse.
+    \item The proposed model effectively utilizes the prior information provided by the given template rather than simply extracting some basic geometric properties. In 2rd row, our model handle convex and concave parts at the same time. We will further demonstrate this in the following experiment.
+\end{enumerate}
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=15.5cm]{src/exp1.png}
+    \end{center}
+    \caption{Segmentation results of binary images.}
+    \label{exp1}
+\end{figure}
+
+We will further observe the impact of different templates on the segmentation results from Figure \ref{exp2}. The meanings of each column is the same with Figure \ref{exp1}. The original image is similar to a hexagon, and we used hexagon, circle, diamond and square templates to segment it, with the results shown in 1st, 2nd, 3rd and 4th row respectively. We can find that all of the segmentation results preserve some shape characteristics of their corresponding templates but their performances differ significantly. The 1st row is the best, 2nd row is still acceptable but 3rd and 4th rows are far from accurate. That indicates our proposed method is highly sensitive to the given template. A precise template gives a prefect segmentation result, while an unsuitable template leads a terrible one. But on the other hand, it also implies our model has a certain level of understanding of the prior information.
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=15.5cm]{src/exp2.png}
+    \end{center}
+    \caption{Segmentation results under different templates.}
+    \label{exp2}
+\end{figure}
+
+\subsection{Natural images}
+The experimental results on binary images demonstrate that our model can effectively utilize prior information to segment partially damaged target object. However, we are far from satisfied with this and we extend the model's application to real-world images.
+
+Figure \ref{exp3} presents some results on natural images. As before, original image, template, HBS, segmentation without HBS and segmentation with HBS are sequentially displayed in columns 1 to 5 of each row. The 1st row is a grayscale image with a bear in grass. Without HBS, the model only relies on the intensity of grayscale values to determine the shape boundaries, which results in the top boundary being limited to the brighter nose and forehead, while the bottom boundary appears jagged due to the grass. When HBS is specified, even the circle is not a very suitable template, it helps our proposed HBS segmentation model to generate a much smoother and more complete result. The other 3 images are color images, which need to be compressed RGB to grayscale before applying our model. The result in 2nd row demonstrates no matter how many pieces the target object is seprated to, our model can segment it as a simply-connected entity, just like what it does on binary images. The 3rd row represents similar but a more practical scenario, occlusion, and our model successfully and accurately identifies the white paper behind pens. In the 4th row, our model also completely locates the signboard partially covered under the dust. 
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=15.5cm]{src/exp3.png}
+    \end{center}
+    \caption{Segmentation results of natural images.}
+    \label{exp3}
+\end{figure}
+
+
 
 \section{Conclusion}\label{conclusion}
 
