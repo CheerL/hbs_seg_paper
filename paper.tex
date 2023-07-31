@@ -36,7 +36,7 @@
 \maketitle
 
 \begin{abstract}
-    %   There is a growing interest in shape analysis in recent years. We present a novel shape signature for 2D bounded simply-connected domains, named the Harmonic Beltrami signature (HBS). The proposed signature is based on the harmonic extension of the conformal welding map of a unit circle and its Beltrami coefficient. We show that there is a one-to-one correspondence between the quotient space of HBS and the space of 2D simply-connected shapes up to a translation, rotation and scaling. With a suitable normalization, each equivalence class in the quotient space of HBS is associated to a unique representative. It gets rid of the conformal ambiguity. As such, each shape is associated to a unique HBS. Conversely, the associated shape of a HBS can be reconstructed based on quasiconformal Teichm\"uller theories, which is uniquely determined up to a translation, rotation and scaling. The HBS is thus an effective fingerprint to represent a 2D shape. The robustness of HBS is studied both theoretically and experimentally. With the HBS, simple metric, such as $L^2$, can be used to measure geometric dissimilarity between shapes. Experiments have been carried out to classify shapes in different classes using HBS. Results show good classification performance, which demonstrate the efficacy of our proposed shape signature.
+    
 \end{abstract}
 
 \begin{keywords}
@@ -46,46 +46,9 @@
 \section{Introduction}
 \label{intro}
 
-% The outline of a shape contains important information, which can be used in many applications, such as medical image analysis, image segmentation, recognition, registration and so on. In order to utilize the shape information, an effective descriptor to represent a shape is a necessary and fundamental tool for many applications in pattern recognition and computer visions. Nevertheless, defining a robust shape signature to describe the space of shapes is still a mathematically challenging problem. A good shape signature should be easy to compute and retain essential geometric features of a shape. Meanwhile, a practical shape signature should be invariant under rigid motion (rotation, translation and scaling) and robust to noise. More desirably, the space of shape signatures should inherits a natural and simple metric. With the natural metric, two shapes can be quantitatively compared and prior shape information can be incorporated into various imaging models by adding a penalty term to further improve the accuracy. Of course, the shape signature must be simple to manipulate such that the modified imaging model is numerically manageable.
-
-% Because of its significance, this problem has been widely studied and different models to build the metric shape space have been proposed. In general, existing approaches for constructing shape descriptors can be divided into two main categories, namely, the region-based methods and the contour-based methods. Region-based methods use all information of pixels within a shape. While more information is considered, these methods are often more computationally demanding. In contrast, the contour-based methods only use the boundary information of the shape. Various descriptors capturing the essential geometric features of the shape contour have been recently proposed. It is worth mentioning that many of these shape descriptors in either categories cannot completely capture the geometric information of the shape. In other words, the shape associated to a given shape descriptor cannot be uniquely determined up to rigid motions. Motivated by this, we propose in this paper a shape signature for 2D bounded simply-connected shapes, called the Harmonic Beltrami signature, based on the quasiconformal Teichm\"uller theories. Each shape signature is associated to a unique shape up to rigid motions. Thus, the proposed signature can capture the geometric information of a shape completely.
-
-% More specifically, given a simply-connected bounded domain, the conformal disk parameterizations of the inner and outer regions are computed. It gives rise to the conformal welding of the boundary contour of the domain. The harmonic extension of the welding map can be computed, whose Beltrami coefficient then defines the shape signature, called the {\it Harmonic Beltrami signature (HBS)}. Theoretically, it can be shown that there is a one-to-one correspondene between the quotient space of HBS and the space of 2D simply-connected shapes up to rigid motions. With a suitable normalization, each equivalence class in the quotient space of HBS has a unique representative, which helps to get rid of the conformal ambiguity. In particular, each shape is associated to a unique HBS. Also, given a HBS, the associated shape can be uniquely reconstructed up to a translation, rotation and scaling. As such, the HBS can be regarded as an effective fingerprint to represent a 2D shape. Note that conformal map of a region is robust to noises on the boundary contour of the domain. The proposed HBS, which is based on the conformal maps and the harmonic extension, is robust to noises. The proposed signature also allows us to study the space of shapes by analyzing the space of HBS, which is easy to manipulate. In fact, with the HBS, simple metric can be used to measure geometric dissimilarity between shapes. This can be applied to various pattern recognition and image analysis tasks.
-
-% The paper is organized as follows: Section \ref{related work} reviews some related topics about shape descriptors; Section \ref{background} introduces some theoretic background; Section \ref{main} explains our proposed Harmonic Beltrami signature in details; Section \ref{implementation} gives the implementation details; Section \ref{result} reports our experimental results. The paper is concluded in Section \ref{conclusion} and we point out several future directions.
-
-\section{Contributions}
-The contributions of this paper can be summarized as follows.
-\begin{enumerate}
-    \item Firstly, we propose a new shape signature, called the Harmonic Beltrami signature, to effectively represent 2D simply-connected shapes. Every shape has a unique Harmonic Beltrami signature. Conversely, given a Harmonic Beltrami signature, its corresponding shape can be determined up to a translation, rotation and scaling.
-          % \item Secondly, the proposed Harmonic Beltrami signature solves the issue of conformal ambiguities facing the conformal welding signature.
-          % \item Thirdly, we propose a practical procedure to normalize the Harmonic Beltrami signature to handle the non-uniqueness issue, with rigorous theoretical justifications.
-          % \item Fourthly, we propose a reconstruction algorithm to construct the corresponding shape from the Harmonic Beltrami signature up to a rotation, translation and scaling. This allows us to go back and fro between shapes and Beltrami signatures in the imaging model.
-          % \item Finally, the proposed Harmonic Beltrami signature inherits a simple metric, namely, the $L^2$ distance, to measure the geometric dissimilarity between shapes. We have applied the shape distance to shape classification and shown satisfactory results. 
-\end{enumerate}
 
 \section{Related works}\label{related work}
-% Shape representation and description is an enduring field and there have been extensive and in-depth discussions in the past several decades. Demisse \etal \cite{demisse2017deformation} proposed a method to represent an ordered set of points sampled from a curved shape as an element of a finite dimensional matrix Lie group. Mokhtarian \etal \cite{mokhtarian1997efficient} used the maxima of curvature zero-crossing contours of Curvature Scale Space image to represent the shapes of object boundary contours. Lui \etal \cite{lui2013shape} extracted each component of a 2D multi-connected shape, then the conformal weldings represent all components and conformal modules describe relationships between components. 
 
-% A more meticulous survey about shape representations can be found in \cite{zhang2004review}. Generally speaking, all of these representation techniques can be divided into two major categories, \textit{contour-based} methods and \textit{region-based} methods, depending on whether shape features are extracted from the contour only or from the whole shape region.
-
-% \subsection{Contour-based methods}
-%     As its name suggests, this kind of representations only exploits the information providing by shape boundary. A very natural idea is that the boundary can be taken as a whole, from which a multi-dimensional numeric feature vector can be calculated and becomes the demanded representation.
-
-%     The simplest features are area, circularity, curvature and so on and their combination can be used as shape representation. Peura \etal \cite{peura1997efficiency} proposed such a descriptor including convexity, ratio of principle axis, circular variance and elliptic variance. Belongie \etal \cite{belongie2002shape} tried in a different way and built a representation based on Hausdorff distance, called shape context. For any boundary point $p$, they calculated the Hausdorff distance $d_{pq}$ and the orientation $\theta_{pq}$ with any other boundary point $q$, then these $d_{pq}$ and $\theta_{pq}$ are quantized to create a histogram map $H_p$, which is used to represent the point $p$. All the histograms $H_p$ are flattened and concatenated to form the context of the shape. Asada \etal \cite{asada1986curvature} attempted to smooth the boundary by Gaussian filter as well as the second derivatives of Gaussian filter, then the remained inflection points are expected to be significant object characteristics.
-
-%     Some other contour-based representations pay more attention to local boundary information and break the shape down into many pieces. Chain code describes an object by a sequence of unit-size line segments with a given orientation, which was introduced by Freeman \etal \cite{freeman1961encoding}. Groskey \etal \cite{grosky1990index} proposed polygon decomposition as representation. The given shape boundary is broken down into line segments by polygon approximation. The feature for each segment is expressed as four elements, internal angle, distance from the next vertex, and its $x$ and $y$ coordinates. Berretti \etal \cite{berretti2000retrieval} extended Groskeyet's model. The curvature zero-crossing points from a Gaussian smoothed boundary are used to obtain smooth curve, called tokens. The features for each token are its maximum curvature and orientation, and the similarity between two tokens is measured by the weighted Euclidean distance. 
-
-% \subsection{Region-based methods}
-%     Different from the previous category, region-based representations make the best use of all the pixels within the given shape region. Geometric moment is a classical and representative region-based shape description with form
-%     \begin{equation*}
-%         m_{pq} = \sum_x \sum_y x^p y^q f(x, y),
-%     \end{equation*}
-%     where $p, q = 0, 1, 2, \cdots$ and $f$ is the given shape. Hu published the first significant paper about geometric moment and applied it in pattern recognition \cite{hu1962visual}. Taubin \etal \cite{taubin1991object,taubin1991recognition} proposed algebraic moment, which is computed from the first $m$ central moments and is given as the eigenvalues of predefined matrices $M_{j, k}$, whose elements are scaled factors of the central moments. Zhang \etal \cite{zhang2002generic} proposed Generic Fourier descriptor which is acquired by applying a 2D Fourier transform on a polar-raster sampled image
-%     \begin{equation*}
-%         PF_2(\rho, \phi) = \sum_r \sum_k f(r, \theta_k) e^{2 \pi i (\frac{r}{R} \rho + \theta_k \phi)},
-%     \end{equation*}
-%     where $0 \le r < R$, $0 \le \rho < R$, $0 \le k < T$, $0 \le \phi < T$, $\theta_k = \frac{2\pi k}{T}$ and $R, T$ are the radial frequency resolution and angular frequency resolution respectively
 
 \section{Theoretical basis}\label{background}
 \subsection{Quasi-conformal mapping and Beltrami equation}
@@ -129,61 +92,11 @@ Note that there is a one-to-one correspondence between the quasi-conformal mappi
     Suppose $\mu : \C \rightarrow \C$ is Lebesgue measurable satisfying $\norm{\mu}_\infty <1$; then, there exists a quasi-conformal homeomorphism $f$ from $\C$ onto itself, which is in the Sobolev space $W_{1,2}(\C)$ and satisfies the Beltrami equation in the distribution sense. The associated quasi-conformal homeomorphism $f$ is unique up to a Mobi\"us transformation. Furthermore, by fixing $0$, $1$ and $\infty$, the $f$ is uniquely determined.
 \end{theorem}
 
-Suppose $f, g: \C \rightarrow \C$ are complex-valued function with Beltrami coefficient $\mu_f, \mu_g$ respectively. Then the Beltrami coefficient for the composition $g \circ f$ is given by 
-\begin{equation}\label{mu of composition}
-    \mu_{g \circ f} = \frac{\mu_f+(\mu_g \circ f) \tau}{1+\overline{\mu_f}(\mu_g \circ f) \tau},
-\end{equation}
-where $\tau = \frac{\overline{f_z}}{f_z}$. Note that when $g$ is conformal, $\mu_g = 0$ and 
-\begin{equation}\label{mu of conformal composition}
-    \mu_{g \circ f} = \mu_f.
-\end{equation}
+\subsection{LBS}
 
-% \subsection{Conformal welding}\label{welding}
-% Given a 2D bounded simply-connected shape, we can treat it as a 2D bounded simply-connected domain $\Omega \subset \C$, by Riemann mapping theorem, there exist conformal functions $\Phi_1: \D \rightarrow \Omega$ and $\Phi_2: \D^c \rightarrow \Omega^c$. $\Phi_1$ and $\Phi_2$ are unique up to a \textit{Mobi\"us transformation}:
-% \begin{equation}
-%     M(z) = e^{i \theta} \frac{z - a}{1 - \overline{a}z}.
-% \end{equation}
-% Then we can define \textit{conformal welding} as:
-% \begin{equation}
-%     f = \Phi_1^{-1} \circ \Phi_2.
-% \end{equation}
-% Such $f: \partial \D \rightarrow \partial \D$ is a diffeomorphism from $\partial \D$ to itself, which can be also thought as a periodic real-valued monotone increasing function $f_\R: [0, 2\pi) \rightarrow [0, 2\pi)$ such that $f(e^{i \theta}) = e^{i f_\R(\theta)}$ (see figure \ref{fig1}).
+\subsection{HBS}
 
-% However, such welding mappings are not unique because of the arbitrariness of Riemann mappings, as shown in figure \ref{unsatble}.
-
-% \begin{figure}
-%     \begin{center}
-%         \includegraphics[width=8cm]{unstable_welding.png}
-%     \end{center}
-%     \caption{Different conformal welding mappings (b), (c) and (d) of the same shape (a)}
-%     \label{unsatble}
-% \end{figure}
-
-% \subsection{Harmonic function and Poisson integral}
-% A complex-valued function $f$ defined on $\Omega \subset \C$ is called \textit{harmonic} if it satisfies the \textit{Laplace's equation}:
-% \begin{equation}
-%     \Delta f = 4 \frac{\partial^2 f}{\partial z \partial \overline{z}} = \frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2} = 0,
-% \end{equation}
-% where $z = x + iy$, $\bar{z} = x -iy$.
-
-% Chen \etal \cite{chen2010compositions} proved following theorem, which tells us in what condition the composition of harmonic mappings and other mappings can inherit the harmonicity.
-% \begin{theorem}\label{composition of harmonic}
-%     Let $f$ be a harmonic mapping, $f \circ g$ is harmonic if and only if $g(z) = az + b \overline{z} + c$, where $a$, $b$ and $c$ are constants and $g \circ f$ is harmonic if and only if $g$ is analytic or anti-analytic.
-% \end{theorem}
-
-% The harmonic function on a compact set is determined by its restriction to the boundary, which follows from the maximum principle, and the progress to find a harmonic function from the given domain and the value in domain's boundary is call \textit{Dirichlet problem}. For a special case, where the domain is unit disk, \textit{Poisson integral} shows a method to obtain the solution $H : \overline{\D} \rightarrow \C$ of Dirichlet problem from a continuous $f$ on $\partial \D$
-%     \begin{equation}\label{poisson integral}
-%         H(re^{i\theta}) = \frac{1}{2\pi}\int_0^{2\pi} \frac{(1-r^2)f(e^{i \varphi})}{1 - 2 r cos (\varphi - \theta) + r^2} d\varphi.
-%     \end{equation}
-% Such $H$ is harmonic on $\D$ and continuous on $\overline{\D}$ and has the same value with $f$ on the $\partial \D$, i.e. $H(e^{i\theta}) = f(e^{i\theta})$ (see figure \ref{harmonic}). Of course, it is uniquely determined by $f$.
-
-% \begin{figure}
-%     \begin{center}
-%         \includegraphics[width=12cm]{fig4.png}
-%     \end{center}
-%     \caption{(a) Continuous function $f(e^{i \theta}) = \sin(10 \theta) + \cos(10 \theta)$ defined on $\partial \D$; (b) The corresponding harmonic function $H$ generated from $f$ by the equation (\ref{poisson integral}). Note that we used real-valued function to illustrate the progress of harmonic extension for the convenience, but it is also feasible for complex-valued function.}
-%     \label{harmonic}
-% \end{figure}
+\subsection{Euler-Lagrange equation}
 
 \section{Proposed segmentation model}\label{main}
 In this section, we describe our proposed shape prior segmentation model guided by HBS.
@@ -215,7 +128,7 @@ where $u = f_\mu - Id$, $\mu: \Omega \rightarrow \C$ is the Beltrami coefficient
 The first item of $E_{\text{BC}}$ measures the difference between the deformed image $I \circ f_\mu$ and the template image $J_{c_1, c_2}$. The second item limits the magnitude of $\mu$ since $\abs{\mu} < 1$ if and only if $f_\mu$ is quasiconformal, which then ensures the bijectivity of $f_\mu$. The last three items are the regularization terms, which are used to control the smoothness of $f_\mu$.
 
 \subsection{HBS segmentation model}
-The HBS proposed in \cite{} is a powerful signature of 2D simply-connected shapes and  it represents the shape features by a complex function $B: \D \rightarrow \C$. More precisely, the HBS $B$ of the shape $\Omega_B \subset \C$ is the Beltrami coefficient of a special harmonic function $H$ such that $H(\D) = \Omega_B$. The HBS $B$ is invariant under translation, rotation and scaling, which means it can be treated as high-level shape priors with invariant geometric information under these transformations. As is well-known, translation, rotation and scaling are very common in image processing and we have good reason to believe that the HBS and the inherent invariant features it contains can effectively guide image segmentation. Inspired by this, we propose this novel HBS segmentation model.
+The HBS proposed in \cite{} is a powerful signature of 2D simply-connected shapes and  it represents the shape features by a complex function $B: \D \rightarrow \C$. More precisely, the HBS $B$ of the shape $\Omega_B \subset \C$ is the Beltrami coefficient of a special harmonic function $H$ such that $H(\D) = \Omega_B$. The HBS $B$ is invariant under translation, rotation and scaling, which means it can be treated as high-level shape prior with invariant geometric information under these transformations. As is well-known, translation, rotation and scaling are very common in image processing and we have good reason to believe that the HBS and the inherent invariant features it contains can effectively guide image segmentation. Inspired by this, we propose this novel HBS segmentation model.
 
 Meanwhile, the primary objective of the segmentation model \ref{bc seg model} is to locate a suitable Beltrami coefficient $\mu$ and the corresponding quasiconformal function $f_\mu$, then the target region is $\Omega = f_\mu(R)$. 
 
@@ -291,7 +204,7 @@ However, this model implies a constraint, $\mu_V = \frac{\partial f_{\mu_V}}{\pa
         + \lambda \abs{\nu_V - \mu_{B,V}}^2 + \eta \abs{\Delta u_V}^2 + \tau \abs{\nu_V - \mu_V}^2.
     \end{split}
 \end{equation}
-Here we replace all $\mu_V$ by $\nu_V$ in 2rd, 3th and 6th terms of model \ref{discrete hbs seg model} and add a new term $\tau \abs{\nu_V - \mu_V}^2$ to handle the difference between $\mu_V$ and $\nu_V$, where $\tau > 0$ is a big penalty parameter. If $\nu_V = \mu_V$, $E_{\text{WHBS}}$ will degenerate to $E_{\text{DHBS}}$. This modification allows us to split the original problem into 2 parts and we call them \textbf{$\mu$ subproblem}
+Here we replace all $\mu_V$ by $\nu_V$ in 2nd, 3th and 6th terms of model \ref{discrete hbs seg model} and add a new term $\tau \abs{\nu_V - \mu_V}^2$ to handle the difference between $\mu_V$ and $\nu_V$, where $\tau > 0$ is a big penalty parameter. If $\nu_V = \mu_V$, $E_{\text{WHBS}}$ will degenerate to $E_{\text{DHBS}}$. This modification allows us to split the original problem into 2 parts and we call them \textbf{$\mu$ subproblem}
 \begin{equation}\label{mu subproblem}
     \min_{\mu_V} E_{\mu}(\mu_V, c_1, c_2) = 
     \min_{\mu_V} \sum_{v \in V}
@@ -428,7 +341,7 @@ Let's look back on Figure \ref{exp1}, from which we can preliminarily obtain the
     \item The proposed model can segment both the simply-connected and multi-connected images and then give simply-connected results. Although the HBS is the signature of simply-connected shapes, our model works well on multi-connected images in 3rd and 4th rows.
     \item The proposed model does not impose any requirements on the position, size, or orientation of the target object in the image. The HBS is invariant under translation, rotation and scaling and our model inherited this feature. With the same HBS, 1st and 2nd row are rectangles in different size and our model can segment them correctly. Similarly, 3rd and 4th rows are triangles in different orientation.
     \item The proposed model tolerates reasonable discrepancies between the prior information and the actual image. In the 5th row, the segmentation result is acceptable when the template is a circle and the image is close to a ellipse.
-    \item The proposed model effectively utilizes the prior information provided by the given template rather than simply extracting some basic geometric properties. In 2rd row, our model handle convex and concave parts at the same time. We will further demonstrate this in the following experiment.
+    \item The proposed model effectively utilizes the prior information provided by the given template rather than simply extracting some basic geometric properties. In 2nd row, our model handle convex and concave parts at the same time. We will further demonstrate this in the following experiment.
 \end{enumerate}
 
 \begin{figure}
@@ -461,6 +374,52 @@ Figure \ref{exp3} presents some results on natural images. As before, original i
     \caption{Segmentation results of natural images.}
     \label{exp3}
 \end{figure}
+
+\subsection{Shape prior of complex images}
+We have illustrated that shape prior can help segmentation but how to obtain shape prior still remains a challenging problem. In the previous experiments, the templates fed into our model are always simple geometric shapes such as circle, triangle and so on. Although these simple shapes allow our model to achieve good results, they actually conceals its enormous potential.
+
+We can describe basic geometric shapes with simpler signatures like area, density, curvature, circularity and so on. But when the complexity of the object reaches a certain level, it becomes difficult for traditional signatures to fully represent the shape information, while the HBS demonstrates its capacity. The HBS uses a simple and unified form to fully describe the characteristics of the shapes, exhibiting a range of wonderful properties and enabling reconstruction of the original shapes. Apart from extracting the shape boundaries, the HBS does not require any additional preprocessing to the image, which makes it extremely easy to find common features from a large number of images of the same object class. Figure \ref{exp5} provides an example of computing shape prior of brains. For 1-6 rows, 1st column is the image of brain with green line as brain boundary, 2nd column is its HBS and 3rd column is the reconstructed brain from HBS. We can observe that there is a small gap between the given boundary in 1st column and reconstructed brain in 3rd column, which actually is due to the resolution. But it does not affect our segmentation since the reconstructed results are not used in our segmentation model. Besides, this gap will decrease when the resolution increases as mentioned in \cite{}.
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=9cm]{src/exp5.png}
+    \end{center}
+    \caption{HBS of brains and their mean HBS.}
+    \label{exp5}
+\end{figure}
+
+Then we directly calculate the algebraic mean of the HBS of above 6 brains, called the mean HBS, and also reconstruct a brain from the mean HBS, called the mean shape. They are respectively shown in 2nd and 3rd column of 7th row. Even though the relationship between HBS and the shape is challenging to explain, we can still observe the following features from the first 6 rows:
+\begin{enumerate}
+    \item The majority of HBS values are small, corresponding to the brain appearing like a circle.
+    \item The left side of the HBS has larger values, while the right side has smaller values, reflecting the brain's slightly tapered shape.
+    \item HBS values exhibit scattered high values along the boundary, corresponding to the sulcus in the brain's outline. Note that the boundary of HBS is $\partial \D$ since it is always $0$ outside.
+\end{enumerate}
+The mean HBS preserves these features, but the boundary values which approach 1 become much less and only exist at the left and right ends. This is reflected in the image is a smoother outline, with distinct inward curvatures only at the division between the left and right halves of the brain. Because of that, we believe that mean HBS serves as a good shape prior.
+
+It is worth mentioning that utilizing mean HBS as shape prior is not trivial even mean HBS is just the HBS of the mean shape. Becaus if you wanted to achieve a mean shape directly, you would need to align, resize, and orient the shapes based on certain feature points explicitly. Besides, the rationality and universality of these feature points are also crucial factors to consider. However, the mean HBS is a common and convenient method to extract shape prior with soild theoretical background.
+
+\subsection{Segmentation of complex images}
+With the help of the mean HBS, we can now apply our proposed segmentation model to complex images. Firstly, We take the mean HBS in last experiment and some new brains as an example. For each row in Figure \ref{exp6}, 1st column is the given brain, 2nd is the segmentation result without HBS, 3rd is the segmentation result guided by the HBS of unit disk and 4th is the segmentation result guided by the mean HBS in Figure \ref{exp5}.
+
+\begin{figure}
+    \begin{center}
+        \includegraphics[width=15.5cm]{src/exp6.png}
+    \end{center}
+    \caption{Segmentation on brains guided by mean HBS.}
+    \label{exp6}
+\end{figure}
+
+The brain in 1st row is quite similar with those we used to compute mean HBS in last experiment, leading that the result guided by mean HBS is almost prefect. The result guided by the HBS of unit disk loss some top and bottom region, maybe that makes it looks more like a circle. And the result without HBS has a very rough boundary and tends to discard regions with relatively discontinuous intensity, like the small part on left bottom of the object due to a deep sulcus. The brain in 2nd row has a pathological region in the left bottom corner and deviates from the common features we summarized. Therefore, the segmentation result with mean HBS is not satisfactory enough and it tries to make up the missing region. While the other 2 results appear similar features with 1st row.
+
+
+%  as Figure \ref{exp4} shown. The 1st row consists of binary images of 4 animals, and the 2nd row shows their respective HBS.
+
+% \begin{figure}
+%     \begin{center}
+%         \includegraphics[width=15.5cm]{src/exp4.png}
+%     \end{center}
+%     \caption{HBS of complex images of animals.}
+%     \label{exp4}
+% \end{figure}
 
 
 
